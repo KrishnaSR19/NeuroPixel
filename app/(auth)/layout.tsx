@@ -1,9 +1,9 @@
-import React from 'react'
-
-function Layout({children}:{children:React.ReactNode}) {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <main className='auth'>{children}t</main>
-  )
-}
+    <main className="flex min-h-screen items-center justify-center w-full bg-purple-100">
+      {children}
+    </main>
+  );
+};
 
-export default Layout
+export default Layout;
