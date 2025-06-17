@@ -1,9 +1,11 @@
-import React from 'react'
+'use client'
 
-function Home() {
+
+export default function Home() {
   return (
-    <div>Home</div>
+    <div >
+      <h1 className="text-3xl font-bold">Welcome to NeuroPixel</h1>
+
+    </div>
   )
 }
-
-export default Home
