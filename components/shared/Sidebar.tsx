@@ -7,11 +7,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { Button } from "../ui/button";
-import { useUser } from "@clerk/nextjs";
+
 
 const Sidebar = () => {
   const pathname = usePathname();
-  const { user, isSignedIn } = useUser();
+
 
   return (
     <aside className="hidden h-screen w-72 flex-col bg-white p-5 shadow-md shadow-purple-200/50 lg:flex">
