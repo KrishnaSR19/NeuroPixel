@@ -9,24 +9,21 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // ERROR HANDLER
-export const handleError = (error: unknown) => {
+export const handleError = (error: unknown): never => {
   if (error instanceof Error) {
-    // This is a native JavaScript error (e.g., TypeError, RangeError)
     console.error(error.message);
     throw new Error(`Error: ${error.message}`);
   } else if (typeof error === "string") {
-    // This is a string error message
     console.error(error);
     throw new Error(`Error: ${error}`);
   } else {
-    // This is an unknown type of error
     console.error(error);
     throw new Error(`Unknown error: ${JSON.stringify(error)}`);
   }
 };
 
-// PLACEHOLDER LOADER - while image is transforming
-const shimmer = (w: number, h: number) => `
+// PLACEHOLDER LOADER
+const shimmer = (w: number, h: number): string => `
 <svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
     <linearGradient id="g">
@@ -40,7 +37,7 @@ const shimmer = (w: number, h: number) => `
   <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
 </svg>`;
 
-const toBase64 = (str: string) =>
+const toBase64 = (str: string): string =>
   typeof window === "undefined"
     ? Buffer.from(str).toString("base64")
     : window.btoa(str);
@@ -59,9 +56,8 @@ export const formUrlQuery = ({
   searchParams,
   key,
   value,
-}: FormUrlQueryParams) => {
+}: FormUrlQueryParams): string => {
   const params = { ...qs.parse(searchParams.toString()), [key]: value };
-
   return `${window.location.pathname}?${qs.stringify(params, {
     skipNulls: true,
   })}`;
@@ -75,14 +71,13 @@ interface RemoveUrlQueryParams {
 export function removeKeysFromQuery({
   searchParams,
   keysToRemove,
-}: RemoveUrlQueryParams) {
-  const currentUrl = qs.parse(searchParams);
+}: RemoveUrlQueryParams): string {
+  const currentUrl = qs.parse(searchParams) as Record<string, unknown>;
 
   keysToRemove.forEach((key) => {
     delete currentUrl[key];
   });
 
-  // Remove null or undefined values
   Object.keys(currentUrl).forEach(
     (key) => currentUrl[key] == null && delete currentUrl[key]
   );
@@ -91,7 +86,10 @@ export function removeKeysFromQuery({
 }
 
 // DEBOUNCE
-export function debounce<T extends (...args: any[]) => void>(func: T, delay: number) {
+export function debounce<T extends (...args: unknown[]) => void>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
   let timeoutId: NodeJS.Timeout | null = null;
   return (...args: Parameters<T>) => {
     if (timeoutId) clearTimeout(timeoutId);
@@ -121,7 +119,7 @@ export const getImageSize = (
 };
 
 // DOWNLOAD IMAGE
-export const download = (url: string, filename: string) => {
+export const download = (url: string, filename: string): void => {
   if (!url) {
     throw new Error("Resource URL not provided! You need to provide one");
   }
@@ -132,7 +130,6 @@ export const download = (url: string, filename: string) => {
       const blobURL = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = blobURL;
-
       if (filename && filename.length)
         a.download = `${filename.replace(/ /g, "_")}.png`;
       document.body.appendChild(a);
@@ -144,27 +141,33 @@ export const download = (url: string, filename: string) => {
 };
 
 // DEEP MERGE OBJECTS
-export const deepMergeObjects = (
-  obj1: Record<string, any>,
-  obj2: Record<string, any>
-): Record<string, any> => {
+export const deepMergeObjects = <T extends object, U extends object>(
+  obj1: T,
+  obj2: U
+): T & U => {
   if (obj2 === null || obj2 === undefined) {
-    return obj1;
+    return obj1 as T & U;
   }
 
-  const output = { ...obj2 };
+  const output = { ...obj2 } as T & U;
 
   for (const key in obj1) {
     if (Object.prototype.hasOwnProperty.call(obj1, key)) {
+      const val1 = obj1[key as keyof T];
+      const val2 = obj2[key as unknown as keyof U];
+
       if (
-        obj1[key] &&
-        typeof obj1[key] === "object" &&
-        obj2[key] &&
-        typeof obj2[key] === "object"
+        val1 &&
+        typeof val1 === "object" &&
+        val2 &&
+        typeof val2 === "object"
       ) {
-        output[key] = deepMergeObjects(obj1[key], obj2[key]);
+        output[key as keyof (T & U)] = deepMergeObjects(
+          val1 as object,
+          val2 as object
+        ) as (T & U)[keyof (T & U)];
       } else {
-        output[key] = obj1[key];
+        output[key as keyof (T & U)] = val1 as (T & U)[keyof (T & U)];
       }
     }
   }

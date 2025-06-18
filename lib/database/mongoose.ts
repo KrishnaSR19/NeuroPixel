@@ -8,13 +8,11 @@ interface MongooseConnection {
 }
 
 declare global {
-  // Extend the global object with a mongoose cache to prevent multiple connections in development
   // eslint-disable-next-line no-var
   var mongoose: MongooseConnection | undefined;
 }
 
-// Use existing cached connection or initialize
-let cached: MongooseConnection = global.mongoose ?? { conn: null, promise: null };
+const cached: MongooseConnection = global.mongoose ?? { conn: null, promise: null };
 
 if (!global.mongoose) {
   global.mongoose = cached;
