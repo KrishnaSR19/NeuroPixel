@@ -119,6 +119,14 @@ body {
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+.root{
+  @apply flex min-h-screen w-full flex-col bg-white
+  lg:flex-row
+}
+
+.root-container{
+  @apply mt-16 ml-5 flex-1 overflow-auto py-8 lg:mt-0
+}
 
 @layer base {
   * {
