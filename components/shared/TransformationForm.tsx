@@ -14,10 +14,23 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { defaultValues } from "@/constants";
 
-const formSchema = z.object({
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { Input } from "@/components/ui/input";
+import { aspectRatioOptions, defaultValues, transformationTypes } from "@/constants";
+import { CustomField } from "./CustomFiel";
+import { transform } from "next/dist/build/swc/generated-native";
+import { useState } from "react";
+import { AspectRatioKey } from "@/lib/utils";
+
+export const formSchema = z.object({
   title: z.string(),
   aspectRatio: z.string().optional(),
   color: z.string().optional(),
@@ -28,7 +41,15 @@ const formSchema = z.object({
 const TransformationForm = ({
   action,
   data = null,
+  type,
+  userId,
+  creditBalance,
 }: TransformationFormProps) => {
+  const selectedTransformationType = transformationTypes[type];
+
+  const [image, setImage] = useState(data);
+  const [newTransformation, setNewTransformation] =
+    useState<Transformations | null>(null);
 
   const initialValues =
     data && action === "Update"
@@ -44,7 +65,7 @@ const TransformationForm = ({
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues:initialValues
+    defaultValues: initialValues,
   });
 
   // 2. Define a submit handler.
@@ -54,26 +75,59 @@ const TransformationForm = ({
     console.log(values);
   }
 
+  const onSelectFieldHandler = (
+    value: string,
+    onChangeField: (value: string) => void
+  ) => {};
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
+        <CustomField
           control={form.control}
-          name="username"
+          name="title"
+          formLabel="Image Title"
+          className="w-full"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
+            <Input
+              {...field}
+              className="rounded-[16px] border-2 border-purple-200/20 shadow-sm shadow-purple-200/15 text-dark-600 disabled:opacity-100 font-semibold text-[16px] leading-[140%] h-[50px] md:h-[54px] focus-visible:ring-offset-0 px-4 py-3 focus-visible:ring-transparent !important"
+            />
           )}
         />
-        <Button type="submit">Submit</Button>
+
+        {type === "fill" && (
+          <CustomField
+            control={form.control}
+            name="aspectRatio"
+            formLabel="Aspect Ratio"
+            className="w-full"
+            render={({ field }) => (
+              <Select
+              onValueChange={(value)=>
+                onSelectFieldHandler(value, 
+                  field.onChange)}   
+              >
+                <SelectTrigger className="w-full border-2 border-purple-200/20 shadow-sm shadow-purple-200/15 rounded-[16px] h-[50px] md:h-[54px] text-dark-600 font-semibold text-[16px] leading-[140%] disabled:opacity-100 placeholder:text-dark-400/50 px-4 py-3 focus:ring-offset-0 focus-visible:ring-transparent focus:ring-transparent focus-visible:ring-0 focus-visible:outline-none !important;">
+                  <SelectValue placeholder="Select size" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(aspectRatioOptions).map((key)=>(
+                    <SelectItem key={key} value={key}
+                    className="py-3 cursor-pointer hover:bg-purple-10">
+                      {aspectRatioOptions[key as AspectRatioKey].label}
+                  </SelectItem>
+
+                  ))}
+
+                </SelectContent>
+              </Select>
+            )}
+          />
+        )}
+
+
+        
       </form>
     </Form>
   );
