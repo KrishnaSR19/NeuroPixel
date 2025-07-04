@@ -31,8 +31,8 @@ import {
 } from "@/constants";
 import { CustomField } from "./CustomFiel";
 import { transform } from "next/dist/build/swc/generated-native";
-import { useState } from "react";
-import { AspectRatioKey, debounce } from "@/lib/utils";
+import { useState, useTransition } from "react";
+import { AspectRatioKey, debounce, deepMergeObjects } from "@/lib/utils";
 
 export const formSchema = z.object({
   title: z.string(),
@@ -61,6 +61,8 @@ const TransformationForm = ({
   const [isTransforming, setIsTransforming] = useState(false);
 
   const [transformationConfig, setTransformationConfig] = useState(config);
+
+  const [isPending, startTransition] = useTransition();
 
   const initialValues =
     data && action === "Update"
@@ -118,13 +120,25 @@ const TransformationForm = ({
         },
       }));
     }, 1000)();
-
-    const onTransformHandler=()=>{
-
-    }
-
     return onChangeField(value);
   };
+
+
+      //Todo:Return to updateCredits function
+
+    const onTransformHandler=async()=>{
+      setIsTransforming(true);
+
+      setTransformationConfig(
+        deepMergeObjects(newTransformation ?? {}, transformationConfig ?? {})
+      )
+      setTransformationConfig(null);
+
+      startTransition(async()=>{
+        // await updateCredits(userId,creditFee)
+      })
+    }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -228,7 +242,7 @@ const TransformationForm = ({
             type="button"
             className="bg-purple-gradient bg-cover rounded-full py-4 px-6 font-semibold text-[16px] leading-[140%] h-[50px] w-full md:h-[54px] capitalize"
             disabled={ isTransforming || newTransformation===null}
-            //  onClick={onTransformHandler}
+             onClick={onTransformHandler}
           >
             {isTransforming? "Transforming...": "Apply Transformation"}
           </Button>
