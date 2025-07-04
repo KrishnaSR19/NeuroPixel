@@ -5,7 +5,6 @@ import { getUserById } from "@/lib/actions/user.actions";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-
 type TransformationType = keyof typeof transformationTypes;
 
 type SearchParamProps = {
@@ -17,8 +16,7 @@ const AddTransformationTypePage = async ({ params }: SearchParamProps) => {
   const { type } = resolvedParams;
   const { userId } = await auth();
 
-  if(!userId) redirect("/sign-in");
-
+  if (!userId) redirect("/sign-in");
 
   const transformation = transformationTypes[type];
 
@@ -29,13 +27,16 @@ const AddTransformationTypePage = async ({ params }: SearchParamProps) => {
   }
   return (
     <>
-    <Header title={transformation.title} subtitle={transformation.subTitle} />
+      <Header title={transformation.title} subtitle={transformation.subTitle} />
 
-    <TransformationForm action="Add"
-    userId={user._id} 
-    type={transformation.type as TransformationTypeKey}
-    creditBalance={user.creditBalance}
-    />
+      <section className="mt-10">
+        <TransformationForm
+          action="Add"
+          userId={user._id}
+          type={transformation.type as TransformationTypeKey}
+          creditBalance={user.creditBalance}
+        />
+      </section>
     </>
   );
 };
