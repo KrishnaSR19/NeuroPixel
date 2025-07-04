@@ -50,17 +50,17 @@ const TransformationForm = ({
   creditBalance,
   config = null,
 }: TransformationFormProps) => {
-  const selectedTransformationType = transformationTypes[type];
+ const transformationType = transformationTypes[type];
 
   const [image, setImage] = useState(data);
   const [newTransformation, setNewTransformation] =
     useState<Transformations | null>(null);
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const [isTransforming, setIsTransforming] = useState(false);
+  const [isTransforming, setIsTransforming] = useState(false);
 
-    const [transformationConfig,setTransformationConfig]=useState(config)
+  const [transformationConfig, setTransformationConfig] = useState(config);
 
   const initialValues =
     data && action === "Update"
@@ -82,14 +82,26 @@ const TransformationForm = ({
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
-    // ✅ This will be type-safe and validated.
+    //  This will be type-safe and validated.
     console.log(values);
   }
 
   const onSelectFieldHandler = (
     value: string,
     onChangeField: (value: string) => void
-  ) => {};
+  ) => {
+    const imageSize=aspectRatioOptions[value as AspectRatioKey];
+    setImage((prevState:any)=>({
+      ...prevState,
+      aspectRatio:imageSize.aspectRatio,
+      width:imageSize.width,
+      height:imageSize.height,
+    }))
+
+    setNewTransformation(transformationType.config)
+    
+    return onChangeField(value);
+  };
 
   const onInputChangeHandler = (
     fieldName: string,
@@ -106,6 +118,10 @@ const TransformationForm = ({
         },
       }));
     }, 1000)();
+
+    const onTransformHandler=()=>{
+
+    }
 
     return onChangeField(value);
   };
@@ -207,12 +223,25 @@ const TransformationForm = ({
           </div>
         )}
 
-        <Button
-          type="submit"
-          className="bg-purple-gradient bg-cover rounded-full py-4 px-6 font-semibold text-[16px] leading-[140%] h-[50px] w-full md:h-[54px] capitalize"
-        >
-          Submit
-        </Button>
+        <div className="flex flex-col gap-5 lg:flex-row lg:gap-10">
+          <Button
+            type="button"
+            className="bg-purple-gradient bg-cover rounded-full py-4 px-6 font-semibold text-[16px] leading-[140%] h-[50px] w-full md:h-[54px] capitalize"
+            disabled={ isTransforming || newTransformation===null}
+            //  onClick={onTransformHandler}
+          >
+            {isTransforming? "Transforming...": "Apply Transformation"}
+          </Button>
+
+          <Button
+            type="submit"
+            className="bg-purple-gradient bg-cover rounded-full py-4 px-6 font-semibold text-[16px] leading-[140%] h-[50px] w-full md:h-[54px] capitalize"
+            disabled={ isSubmitting }
+           
+          >
+          {isSubmitting?'Submitting...':'Save Image'}
+          </Button>
+        </div>
       </form>
     </Form>
   );
