@@ -59,11 +59,11 @@ export async function deleteImage(imageId: string) {
   try {
     await connectToDatabase();
 
-    revalidatePath(path);
-
-    return JSON.parse(JSON.stringify(image));
+    await Image.findByIdAndDelete(imageId);
   } catch (error) {
-    handleError;
+    handleError(error)
+  } finally{
+    redirect('/')
   }
 }
 
