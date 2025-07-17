@@ -37,7 +37,7 @@ import MediaUploader from "./MediaUploader";
 import TransformedImage from "./TransformedImage";
 import { updateCredits } from "@/lib/actions/user.actions";
 import { getCldImageUrl } from "next-cloudinary";
-import { addImage } from "@/lib/actions/image.actions";
+import { addImage, updateImage } from "@/lib/actions/image.actions";
 import { useRouter } from "next/navigation";
 
 export const formSchema = z.object({
@@ -90,52 +90,72 @@ const TransformationForm = ({
   });
 
   // 2. Define a submit handler.
-async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // console.log(values);
 
     setIsSubmitting(true);
-  
-    if(data || image){
-      const transformationUrl = getCldImageUrl({
-        width :image?.width,
-        height:image?.height,
-        src:image?.publicId,
-        ...transformationConfig,
 
-      })
+    if (data || image) {
+      const transformationUrl = getCldImageUrl({
+        width: image?.width,
+        height: image?.height,
+        src: image?.publicId,
+        ...transformationConfig,
+      });
 
       const imageData = {
-        title:values.title,
-        publicId:image?.publicId,
-        transformationType:type,
-        width:image?.width,
-        height:image?.height,
+        title: values.title,
+        publicId: image?.publicId,
+        transformationType: type,
+        width: image?.width,
+        height: image?.height,
         config: transformationConfig,
-        secureURL:image?.secureUrl,
+        secureURL: image?.secureUrl,
         transformationURL: transformationUrl,
-        aspectRatio:values.aspectRatio,
-        prompt:values.prompt,
-        color:values.color,
-      }
+        aspectRatio: values.aspectRatio,
+        prompt: values.prompt,
+        color: values.color,
+      };
 
-      if(action=="Add"){
-        try{
+      if (action == "Add") {
+        try {
           const newImage = await addImage({
-            image:imageData,
+            image: imageData,
             userId,
-            path:'/'
-          })
+            path: "/",
+          });
 
-          if(newImage){
+          if (newImage) {
             form.reset();
             setImage(data);
             router.push(`/transformations/${newImage.id}`);
           }
+        } catch (error) {
+          console.error("Error adding image:", error);
+        }
+      }
+
+      if (action == "Update") {
+        try {
+          const updatedImage = await updateImage({
+            image: {
+              ...imageData,
+              _id: data._id,
+            },
+            userId,
+            path: `/transformations/${data._id}`,
+          });
+
+          if (updatedImage) {
+            router.push(`/transformations/${updatedImage._id}`);
+          }
+        } catch (error) {
+          console.error("Error adding image:", error);
         }
       }
     }
-    
 
+    setIsSubmitting(false);
   }
 
   const onSelectFieldHandler = (
@@ -184,7 +204,7 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
     setTransformationConfig(null);
 
     startTransition(async () => {
-      await updateCredits(userId,-1)
+      await updateCredits(userId, -1);
     });
   };
 
