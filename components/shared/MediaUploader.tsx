@@ -10,7 +10,7 @@ type UploadedImage = {
   publicId: string;
   width: number;
   height: number;
-  secureUrl: string;
+  secureURL: string;
 };
 
 type MediaUploaderProps = {
@@ -39,7 +39,7 @@ const MediaUploader = ({
       publicId: info.public_id,
       width: info.width,
       height: info.height,
-      secureUrl: info.secure_url,
+      secureURL: info.secure_url,
     };
 
     setImage(uploadedImage);
@@ -81,7 +81,7 @@ const MediaUploader = ({
               <CldImage
                 width={getImageSize(type, image, "width")}
                 height={getImageSize(type, image, "height")}
-                src={image?.secureUrl || publicId}
+                src={image?.secureURL || publicId}
                 alt="Uploaded Image"
                 sizes="(max-width:767px) 100vw , 50vw"
                 placeholder="blur"
