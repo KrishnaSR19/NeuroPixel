@@ -110,7 +110,7 @@ const TransformationForm = ({
         width: image?.width,
         height: image?.height,
         config: transformationConfig,
-        secureURL: image?.secureUrl,
+        secureURL: image?.secureURL,
         transformationURL: transformationUrl,
         aspectRatio: values.aspectRatio,
         prompt: values.prompt,
@@ -201,7 +201,8 @@ const TransformationForm = ({
     setTransformationConfig(
       deepMergeObjects(newTransformation ?? {}, transformationConfig ?? {})
     );
-    setTransformationConfig(null);
+ 
+     setNewTransformation(null)
 
     startTransition(async () => {
       await updateCredits(userId, -1);
