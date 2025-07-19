@@ -210,10 +210,10 @@ const TransformationForm = ({
     });
   };
 
-  useEffect(()=>{
-    if(image && (type=='restore' || type ==='removeBackground'))
-      setNewTransformation(transformationType.config);
-  },[image,transformationType.config,type])
+  // useEffect(()=>{
+  //   if(image && (type=='restore' || type ==='removeBackground'))
+  //     setNewTransformation(transformationType.config);
+  // },[image,transformationType.config,type])
 
   return (
     <Form {...form}>
