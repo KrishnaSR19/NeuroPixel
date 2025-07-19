@@ -1,6 +1,7 @@
 import { navLinks } from "@/constants";
 import Link from "next/link";
 import React from "react";
+import Image from "next/image"
 
 const Home = () => {
   return (
@@ -16,10 +17,11 @@ const Home = () => {
               href={link.route}
               className="flex justify-center flex-col gap-2"
             >
-              <li>
+              <li className="flex justify-center w-fit rounded-full bg-white p-4"> 
+                 <Image src={link.icon} alt="image" width={24} height={24} />
 
               </li>
-              <p>
+              <p className="font-medium text-[14px] leading-[120%] text-center text-white">
                 {link.label}
               </p>
 
