@@ -48,7 +48,7 @@ export const dataUrl = `data:image/svg+xml;base64,${toBase64(
 
 // FORM URL QUERY
 interface FormUrlQueryParams {
-  searchParams: URLSearchParams;
+  searchParams:string;
   key: string;
   value: string | number | null | undefined;
 }
