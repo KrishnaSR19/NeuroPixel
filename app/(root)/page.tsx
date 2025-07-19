@@ -2,8 +2,13 @@ import { navLinks } from "@/constants";
 import Link from "next/link";
 import React from "react";
 import Image from "next/image"
+import { Collection } from "@/components/shared/Collections";
 
-const Home = () => {
+const Home = ({searchParams}:SearchParamProps) => {
+
+  const page = Number(searchParams?.page) || 1;
+  const searchQuery = (searchParams?.query as string ) || "";
+
   return (
     <>
       <section className="sm:flex justify-center items-center hidden h-72 flex-col gap-4 rounded-[20px] border bg-banner bg-cover bg-no-repeat p-10 shadow-inner">
@@ -28,6 +33,10 @@ const Home = () => {
             </Link>
           ))}
         </ul>
+      </section>
+      <section className="sm:mt-12">
+        <Collection />
+
       </section>
     </>
   );
