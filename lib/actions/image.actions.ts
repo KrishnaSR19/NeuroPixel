@@ -93,18 +93,40 @@ export async function getImageById(imageId: string) {
 //GET ALL IMAGES
 
 export async function getAllImages({limit =9 ,page=1, searchQuery =""}:{
-  limit?: number;
-  page?: number;
+   limit?: number;
+  page: number;
   searchQuery?: string;
-})
-{
+}) {
   try {
     await connectToDatabase();
 
-    
+    cloudinary.config({
+      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+      secure: true,
+    })
 
+    let expression = 'folder=imaginify';
 
-  } catch (error) {
-    handleError(error)
+    if (searchQuery) {
+      expression += ` AND ${searchQuery}`
+    }
+
+    const { resources } = await cloudinary.search
+      .expression(expression)
+      .execute();
+
+    const resourceIds = resources.map((resource: any) => resource.public_id);
+
+    let query = {};
+
+    if(searchQuery) {
+      query = {
+        publicId: {
+          $in: resourceIds
+        }
+      }
+    }
+
   }
-}
