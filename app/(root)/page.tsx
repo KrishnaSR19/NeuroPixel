@@ -6,15 +6,16 @@ import { Collection } from "@/components/shared/Collections";
 import { getAllImages } from "@/lib/actions/image.actions";
 
 interface SearchParamProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     query?: string;
-  };
+  }>;
 }
 
 const Home = async ({ searchParams }: SearchParamProps) => {
-  const page = Number(searchParams?.page) || 1;
-  const searchQuery = (searchParams?.query as string) || "";
+  const params = await searchParams; // dynamic routing fix using await
+  const page = params?.page ? Number(params.page) : 1;
+  const searchQuery = params?.query ?? "";
 
   const images = await getAllImages({
     limit: 9,
